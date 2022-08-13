@@ -1,8 +1,10 @@
 import requests
+import time
+import json
 
 cookies = {
     'x-mbga-check-cookie': '1',
-    'sp_mbga_sid_12014827': 'getfromfile',
+    'sp_mbga_sid_12014827': '8',
 }
 
 headers = {
@@ -20,6 +22,20 @@ params = {
     'url': 'http://mg.highschooldd.net/sp/gacha',
 }
 
-response = requests.get('http://g12014827.sp.pf.mbga.jp/', params=params, cookies=cookies, headers=headers)
-with open('test.html', 'wb') as f:
-    f.write(response.content)
+with open('dump.json', 'r') as json_file:
+    json_data = json.load(json_file)
+
+# remove url from card ids
+card_list = [x.replace('http://cdn-prod.highschooldd.net/sp/image/cards/C/', '').replace('.png', '') for x in json_data]
+
+while True:
+    session = requests.session()
+    session.cookies.update(cookies)
+    response = session.get('http://g12014827.sp.pf.mbga.jp/', params=params, headers=headers)
+    print(session.cookies.get_dict())
+    print(session.cookies.get('sp_mbga_sid_12014827'))
+    cookies['sp_mbga_sid_12014827'] = session.cookies.get_dict()['sp_mbga_sid_12014827']
+    with open('test.html', 'wb') as f:
+        f.write(response.content)
+
+    time.sleep(300)
