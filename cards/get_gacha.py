@@ -1,10 +1,11 @@
 import requests
 import time
 import json
-
+with open('cards/cookies.json', 'r') as cookie_file:
+    cookie_data = json.load(cookie_file)
 cookies = {
     'x-mbga-check-cookie': '1',
-    'sp_mbga_sid_12014827': '8',
+    'sp_mbga_sid_12014827': cookie_data['cookie'],
 }
 
 headers = {
@@ -28,8 +29,8 @@ with open('dump.json', 'r') as json_file:
 # remove url from card ids
 card_list = [x.replace('http://cdn-prod.highschooldd.net/sp/image/cards/C/', '').replace('.png', '') for x in json_data]
 
+session = requests.session()
 while True:
-    session = requests.session()
     session.cookies.update(cookies)
     response = session.get('http://g12014827.sp.pf.mbga.jp/', params=params, headers=headers)
     print(session.cookies.get_dict())
@@ -37,5 +38,4 @@ while True:
     cookies['sp_mbga_sid_12014827'] = session.cookies.get_dict()['sp_mbga_sid_12014827']
     with open('test.html', 'wb') as f:
         f.write(response.content)
-
     time.sleep(300)
