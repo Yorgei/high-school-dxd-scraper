@@ -39,32 +39,32 @@ except Exception as e:
 card_list = [x.replace('http://cdn-prod.highschooldd.net/sp/image/cards/C/', '').replace('.png', '') for x in json_data]
 
 # Regex for finding the card's filename from the url
-regex = r"\%2F(\d*\_.*.jpg)"
+regex = r"\%2F(\d*.jpg)"
+
+def download_card(session, link, filename):
+    res = session.get(link)
+    with open(f'cards/imgs/{filename}', 'wb') as card_file:
+        card_file.write(res.content)
+
+def download_html(html_content):
+    with open('html_file.html', 'wb') as f:
+        f.write(html_content)
 
 session = requests.session()
 # Do your loop here for evolutions etc etc
-for card in card_list:
+for i in card_list:
     try:
         session.cookies.update(cookies)
-        url = f'https://g12014827.sp.pf.mbga.jp/?url=http%3A%2F%2Fmg.highschooldd.net%2Fsp%2Fgacha_card_detail%3Fcard_id%3D{card}%26lineup%3Dnormal'
+        url = f'https://g12014827.sp.pf.mbga.jp/?url=http%3A%2F%2Fmg.highschooldd.net%2Fsp%2Fgacha_card_detail%3Fcard_id%3D{i}%26lineup%3Dnormal'
         response = session.get(url, headers=headers)
         cookies['sp_mbga_sid_12014827'] = session.cookies.get_dict()['sp_mbga_sid_12014827']
-        # Cookie debug
-        if session.cookies.get_dict()['sp_mbga_sid_12014827'] != cookie_data['cookie']:
-            with open('cards/cookie.txt', 'a') as ctxt:
-                ctxt.write(session.cookies.get_dict()['sp_mbga_sid_12014827']+'\n')
         page = response.content
         soup = BeautifulSoup(page, 'html.parser')
         links = soup.find('div', class_='center mt10').find('img')['src']
         name = soup.find('ul', class_='colorPram2 mt15').string.strip()
         card_id = re.findall(regex, links)[0]
-        # i wanna see whats wrong ya feel
-        with open('test.html', 'wb') as f:
-            f.write(response.content)
-        try:
-            print(name, card_id)
-        except Exception as e:
-            print(e)
-            pass
+        print('downloading:', name, card_id)
+        download_card(session, links, card_id)
     except Exception as e:
-        print('Error at', card, e)
+        print('Error at', i, e)
+        download_html(response.content)
