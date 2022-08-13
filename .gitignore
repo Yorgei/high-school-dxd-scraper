@@ -1,5 +1,6 @@
 cards/dump.json
-
+dump.json
+cards/cookies.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
