@@ -9,8 +9,6 @@ from bs4 import BeautifulSoup
 with open('cards/cookies.json', 'r') as cookie_file:
     cookie_data = json.load(cookie_file)
 
-regex = r"\%2F(\d*\_.*.jpg)"
-
 # I remember it not working without x-mbga-check-cookie but I don't know if it still requires it
 cookies = {
     'x-mbga-check-cookie': '1',
@@ -39,6 +37,9 @@ except Exception as e:
 
 # remove url from card ids
 card_list = [x.replace('http://cdn-prod.highschooldd.net/sp/image/cards/C/', '').replace('.png', '') for x in json_data]
+
+# Regex for finding the card's filename from the url
+regex = r"\%2F(\d*\_.*.jpg)"
 
 session = requests.session()
 # Do your loop here for evolutions etc etc
