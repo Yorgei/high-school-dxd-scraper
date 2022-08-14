@@ -7,6 +7,10 @@
 3. Don't be a cunt and practically ddos them by spamming requests, there's no rate limit on the CDN but don't be a cunt.
 4. Use sessions if you're going to use python, look at my examples.
 
+-----
+
+# Scraping Cards
+
 ## **Getting Card IDs the dumb way**
 
 Every card's first evolution has a small image like this, so you can just bruteforce until you get working results. If you really want you can just try every combo from 1000-531000000 lol. I never got rate limited while scraping these so have fun

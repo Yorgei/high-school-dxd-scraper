@@ -5,6 +5,11 @@ test.html
 cards/cookie.txt
 cards/imgs/*
 html_file.html
+cards/cookies.txt
+*/*.json
+*/*/*.bin
+*/*/*.png 
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

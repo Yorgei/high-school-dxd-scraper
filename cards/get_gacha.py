@@ -13,6 +13,7 @@ with open('cards/cookies.json', 'r') as cookie_file:
 cookies = {
     'x-mbga-check-cookie': '1',
     'sp_mbga_sid_12014827': cookie_data['cookie'],
+    'G': '20220812%2E231224%2EFho46CaKF3%2E115568771'
 }
 
 # Basic headers from a request using Firefox developer tools. The only thing you really need is the User-Agent
@@ -39,9 +40,11 @@ except Exception as e:
 card_list = [x.replace('http://cdn-prod.highschooldd.net/sp/image/cards/C/', '').replace('.png', '') for x in json_data]
 
 # Regex for finding the card's filename from the url
-regex = r"\%2F(\d*.jpg)"
+regex = r"\%2F(\d.*.jpg)"
 
 def download_card(session, link, filename):
+    # Should do iter chunks but theyre so small I don't care too much
+    # TODO: Check for error'd cards. Example 
     res = session.get(link)
     with open(f'cards/imgs/{filename}', 'wb') as card_file:
         card_file.write(res.content)
@@ -51,20 +54,46 @@ def download_html(html_content):
         f.write(html_content)
 
 session = requests.session()
+
 # Do your loop here for evolutions etc etc
-for i in card_list:
+for i in range(17500, 100000):
     try:
+        # Update the cookies to make sure we have the correct stuff
         session.cookies.update(cookies)
         url = f'https://g12014827.sp.pf.mbga.jp/?url=http%3A%2F%2Fmg.highschooldd.net%2Fsp%2Fgacha_card_detail%3Fcard_id%3D{i}%26lineup%3Dnormal'
         response = session.get(url, headers=headers)
+        # Dump updated cookie to continue if needed.
+        if session.cookies.get_dict()['sp_mbga_sid_12014827'] != cookies['sp_mbga_sid_12014827']:
+            with open('cards/cookies.txt', 'w') as cookie_file:
+                cookie_file.write(session.cookies.get_dict()['sp_mbga_sid_12014827'])
+                print('new cookie')
+        # Update cookie so we don't get logged out, also clearing them to avoid an unwated outcomes. 
         cookies['sp_mbga_sid_12014827'] = session.cookies.get_dict()['sp_mbga_sid_12014827']
+        session.cookies.clear()
+        # Scrape page for URL and Name
         page = response.content
         soup = BeautifulSoup(page, 'html.parser')
-        links = soup.find('div', class_='center mt10').find('img')['src']
-        name = soup.find('ul', class_='colorPram2 mt15').string.strip()
-        card_id = re.findall(regex, links)[0]
-        print('downloading:', name, card_id)
-        download_card(session, links, card_id)
+        
+        # Check for dxd page
+        if soup.find('h1', class_='midashiPink2 midashiText1').string:
+            # Check for request error
+            if soup.find('h1', class_='midashiPink2 midashiText1').string == 'エラー':
+                print(f'Card ID: {i} does not exist.')
+                continue
+
+            # Get Card info
+            links = soup.find('div', class_='center mt10').find('img')['src']
+            name = soup.find('ul', class_='colorPram2 mt15').string.strip()
+            card_id = re.findall(regex, links)[0]
+            print('downloading:', name, card_id)
+            download_card(session, links, card_id)
+        
+        # Check for logout page
+        elif soup.find('h1', class_='loginPage_heading'):
+            print(f'!!! ERROR: LOGGED OUT. PLEASE GET A NEW COOKIE. ABORTING LOOP. !!!')
+            exit()
+        else:
+            print('Unknown Error at', i)
     except Exception as e:
         print('Error at', i, e)
         download_html(response.content)
