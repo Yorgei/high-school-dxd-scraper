@@ -55,3 +55,8 @@ If a card ends in _mobage.jpg or whatever that means it's been "updated" or "cen
 1. https://g12014827.sp.pf.mbga.jp/?url=http%3A%2F%2Fmg.highschooldd.net%2Fsp%2Fgacha_card_detail%3Fcard_id%3D530201121%26lineup%3Dnormal
 
 1. http://cdn-prod.highschooldd.net/sp/image/cards/L3/530201121_W4Q8hjqBX6.jpg
+
+
+### TODO
+- Add different types of cards / images (W,T,S,M,L,union) \
+example http://cdn-prod.highschooldd.net/sp/image/cards/union/525503071_cs2KVdyJAD.jpg?m=1657505545
